@@ -25,6 +25,10 @@ function ListarChamados() {
       .then((response) => response.json())
       .then((data) => setChamados(data));
   }, []);
+
+  const handleOpenModal = (chamado) => {
+    alert(`Chamado número ${chamado.id}`)
+  }
   return (
     <Box
       sx={{
@@ -36,15 +40,17 @@ function ListarChamados() {
     >
       {chamados.map((chamado) => (
         <Card
+        elevation={3}
           key={chamado.id}
           sx={{
-            width: 275,
+            width: { xs: "100%", sm: "40%", md: "40%", lg: "30%" },
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
           }}
         >
-          <CardContent>
+          <CardActions sx={{cursor: 'pointer' }} onClick={()=>handleOpenModal(chamado)}>
+          <CardContent sx={{width: '100%'}}>
             <Box sx={{ display: "flex", justifyContent: "end" }}>
               {moment().isBetween(
                 chamado.created_date,
@@ -113,6 +119,7 @@ function ListarChamados() {
               {moment(chamado.estimated_date).format("DD/MM/YYYY HH:mm")}
             </Typography>
           </CardContent>
+          </CardActions>
           <CardActions>
             <Button>Apagar</Button>
           </CardActions>
