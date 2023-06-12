@@ -23,7 +23,11 @@ import ErrorIcon from "@mui/icons-material/Error";
 import WarningIcon from "@mui/icons-material/Warning";
 import axios from "axios";
 
+import swal from "sweetalert";
+
 import moment from "moment";
+
+import { useNavigate } from "react-router-dom";
 
 const style = {
   position: "absolute",
@@ -47,6 +51,7 @@ function ListarChamados() {
     reasonForClosure: "",
     isClosed: false,
   });
+  const navigate = useNavigate();
   const handleOpen = (chamado) => {
     setSelectedChamado(chamado.id);
     setEditData({
@@ -74,8 +79,8 @@ function ListarChamados() {
       );
   }, []);
 
-  const handleEditChamado = (e) => {
-    e.preventDefault();
+  const handleEditChamado = () => {
+ 
     const data = {
       id: selectedChamado,
       title: editData.title,
@@ -83,13 +88,21 @@ function ListarChamados() {
       reasonForClosure: editData.reasonForClosure,
       isClosed: editData.isClosed,
     };
+    
     axios
       .post("https://chamados.nexustech.net.br/php/edit_chamado.php", data)
       .then((response) => {
-        console.log(response.data);
-        if (response.data.status === "success") {
-          alert(response.data.message);
-        } else if (response.data.status === "error") {
+        
+        if (response.data === "success") {
+          swal({
+            title: "Chamado encerrado!",
+            text: "Os chamados encerrados podem ser visualizados em CHAMADOS ENCERRADOS.",
+            icon: "success",
+            button: "Ok",
+          }).then((value) => {
+            navigate("/");
+          });
+        } else {
           alert(response.data.message);
         }
       })
@@ -97,8 +110,7 @@ function ListarChamados() {
         console.error(`There was an error editing the data: ${error}`);
       });
   };
-
-  console.log(theUser);
+  console.log(chamados);
   return (
     <Box
       sx={{
@@ -108,10 +120,12 @@ function ListarChamados() {
         gap: "20px",
       }}
     >
+      
       {chamados.map((chamado) => {
         const today = moment();
         const estimated = moment(chamado.estimated_date);
         return (
+          chamado.status !== "1" && (
           <Card
             elevation={3}
             key={chamado.id}
@@ -283,6 +297,7 @@ function ListarChamados() {
               </Box>
             </Modal>
           </Card>
+          )      
         );
       })}
     </Box>
